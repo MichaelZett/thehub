@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Fehler</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<!-- Meta-Tags, um das Caching zu verhindern -->
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<link rel="stylesheet" href="./styles/styles.css">
+</head>
+
+<body>
+	<h1>Something went wrong! </h1>
+	<h2>Our Engineers are on it</h2>
+	<a href="/">Go Home</a>
+	<h2>Details</h2>
+	<p th:if="${uuid}" th:text="${uuid}"></p>
+	<p th:if="${status}" th:text="${status}"></p>
+	<p th:if="${message}" th:text="${message}"></p>
+	<p th:if="${stackTrace}" th:text="${stackTrace}"></p>
+	<div th:if="${errors}">
+		<tr th:each="error: ${errors}">
+			<td th:text="${error.field}" />
+			<td th:text="${error.message}" />
+		</tr>
+	</div>
+</body>
+
+</html>
