@@ -1,5 +1,8 @@
 package de.zettsystems.hub.configuration;
 
+import de.zettsystems.hub.security.application.CustomUserDetailsServiceImpl;
+import de.zettsystems.hub.security.domain.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -15,10 +18,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import de.zettsystems.hub.security.application.CustomUserDetailsServiceImpl;
-import de.zettsystems.hub.security.domain.UserRepository;
-import lombok.RequiredArgsConstructor;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -29,23 +28,24 @@ public class WebSecurityConfig {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(AbstractHttpConfigurer::disable) // sonst funktioniert Swagger Post/Put/Delete nicht....
-				.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // h2-console
-																											// sonst
-																											// nicht
-																											// nutzbar
+		http.csrf(AbstractHttpConfigurer::disable) // sonst funktioniert Swagger Post/Put/Delete nicht.... TODO
+				// h2-console sonst nicht nutzbar, uninteressant weil echte DB später
+				.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
 				.authorizeHttpRequests(authConfig -> {
 					authConfig.requestMatchers("/actuator", //
-							"/swagger-ui/**", //
+							"/swagger-ui", //
 							"/v3/api-docs", //
-							"/h2-console").hasRole("ADMIN");
+							"/h2-console", //
+							"/api/users" //
+					).hasRole("ADMIN");
 					authConfig.anyRequest().authenticated();
 				}).formLogin(Customizer.withDefaults()).logout(logout -> {
 					logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
 					logout.logoutSuccessUrl("/");
 					logout.deleteCookies("JSESSIONID");
 					logout.invalidateHttpSession(true);
-				});
+				})
+				.httpBasic(Customizer.withDefaults());
 		return http.build();
 	}
 
