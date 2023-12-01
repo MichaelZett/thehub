@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  hub-db:
+    container_name: pg_hub
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=hub
+    ports:
+      - '5432:5432'

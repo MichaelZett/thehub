@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<title>The Hub Landing Page</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<!-- Meta-Tags, um das Caching zu verhindern -->
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
+	<link rel="stylesheet" href="./styles/styles.css">
+</head>
+
+<body>
+	<div>
+		<h2>Willkommen beim HUB</h2>
+		<div sec:authorize="hasAnyRole('ROLE_ADMIN')">
+			<div class="link"><a href="/swagger-ui/index.html">Swagger</a></div>
+			<div class="link"><a href="/actuator">Actuator</a></div>
+		</div>
+		<div class="link"><a href="/logout">Logout</a></div>
+	</div>
+
+</body>
+
+</html>
