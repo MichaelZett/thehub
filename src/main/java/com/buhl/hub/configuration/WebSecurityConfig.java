@@ -1,5 +1,6 @@
 package com.buhl.hub.configuration;
 
+import com.buhl.hub.common.values.HubRole;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -33,8 +34,8 @@ public class WebSecurityConfig {
 							"/swagger-ui", //
 							"/v3/api-docs", //
 							"/api/users" //
-					).hasRole("ADMIN");
-					authConfig.requestMatchers("/konto").hasRole("USER");
+					).hasRole(HubRole.ADMIN.name());
+					authConfig.requestMatchers("/konto").hasRole(HubRole.USER.name());
 					authConfig.anyRequest().authenticated();
 				}).formLogin(Customizer.withDefaults()).logout(logout -> {
 					logout.logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
@@ -51,7 +52,7 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	public UserDetailsService userDetailsService() {
+	UserDetailsService userDetailsService() {
 
 		UserDetails peter = User.builder() //
 				.username("peter") //

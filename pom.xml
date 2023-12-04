@@ -42,6 +42,14 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${springdoc.starter.version}</version>
@@ -86,6 +94,34 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build-info</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.github.git-commit-id</groupId>
+				<artifactId>git-commit-id-maven-plugin</artifactId>
+				<configuration>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<includeOnlyProperties>
+						<property>git.branch</property>
+						<property>git.commit.id</property>
+						<property>git.commit.user.name</property>
+						<property>git.commit.id.describe</property>
+						<property>git.remote.origin.url</property>
+					</includeOnlyProperties>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<configuration>
+					<processDependencyManagement>false</processDependencyManagement>
 				</configuration>
 			</plugin>
 		</plugins>
