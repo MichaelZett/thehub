@@ -1,4 +1,8 @@
 package com.buhl.hub.shop.values;
 
-public record ShopDTO(String name) {
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+
+@Schema(name = "Shop", description = "Shopdaten")
+public record ShopDTO(@Schema(description = "name") @NotBlank String name) {
 }

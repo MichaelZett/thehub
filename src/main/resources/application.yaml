@@ -8,21 +8,19 @@ spring:
   application:
     name: The Hub
   datasource:
-    url: 'jdbc:postgresql://localhost:5432/hub'
-    username: postgres
-    password: postgres
+    hubone:
+      url: 'jdbc:postgresql://localhost:5432/hub'
+      username: postgres
+      password: postgres
+    hubtwo:
+      url: 'jdbc:postgresql://localhost:5433/hub_2'
+      username: postgres_2
+      password: postgres_2
+
     hikari:
       # https://vladmihalcea.com/why-you-should-always-use-hibernate-connection-provider_disables_autocommit-for-resource-local-jpa-transactions/
       # in combination with jpa.properties.hibernate.connection.provider_disables_autocommit: true
       auto-commit: false
-  jpa:
-    properties:
-      hibernate:
-        connection:
-          provider_disables_autocommit: true
-        jdbc:
-          time_zone: UTC
-    open-in-view: false
   threads:
     virtual:
       enabled: true
