@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableJdbcRepositories(jdbcOperationsRef = "huboneJdbcOperations",
         transactionManagerRef = "huboneTransactionManager",
-        basePackages = "com.buhl.hub.shop.domain")
+        basePackages = {"com.buhl.hub.shop.domain", "com.buhl.hub.logging.domain"})
 public class HuboneDatasourceConfiguration {
 
     @Bean
