@@ -1,34 +1,49 @@
 package com.buhl.hub.logging.adapter;
 
-import ch.qos.logback.classic.Logger;
+import com.buhl.hub.logging.domain.LogEventCollector;
+import com.buhl.hub.logging.domain.LogEventRepository;
+import com.buhl.hub.logging.values.ParamTypes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Enumeration;
+import java.util.Map;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
 public class LoggerInterceptor implements HandlerInterceptor {
-    private final Logger logger;
+    public static final ThreadLocal<LogEventCollector> dataHolder = new ThreadLocal<>();
+    private final LogEventRepository logEventRepository;
+
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        logger.info("[preHandle]" + "[" + request.getMethod() + "]" + request.getRequestURI() + getParameters(request));
+        if (handler instanceof HandlerMethod handlerMethod) {
+            String className = handlerMethod.getBeanType().getName();
+            String methodName = handlerMethod.getMethod().getName();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String caller = null;
+            if (authentication != null) {
+                caller = authentication.getName();
+            }
+
+            Map<String, String[]> paramMap = request.getParameterMap();
+            String contactNo = null;
+            if (paramMap.get("contactNo") != null) {
+                contactNo = paramMap.get("contactNo")[0];
+            }
+            LogEventCollector collector = new LogEventCollector();
+            collector.startLog(className, methodName, null, "TEST",
+                    caller, contactNo, ParamTypes.FORMPARAMS, request);
+            dataHolder.set(collector);
+        }
         return true;
-    }
-
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                           ModelAndView modelAndView) throws Exception {
-        logger.info("[postHandle][" + getRestOrViewName(modelAndView) + "]");
-    }
-
-    private static String getRestOrViewName(ModelAndView modelAndView) {
-        return (modelAndView == null) ? "NO VIEW" : modelAndView.getViewName();
     }
 
     @Override
@@ -37,42 +52,15 @@ public class LoggerInterceptor implements HandlerInterceptor {
         if (ex != null) {
             ex.printStackTrace();
         }
-        logger.info("[afterCompletion][" + response.getStatus() + "][exception: " + ex + "]");
+        final LogEventCollector collector = dataHolder.get();
+        if (collector != null) {
+            logEventRepository.save(collector.finalizeLogEvent());
+            dataHolder.remove();
+        }
     }
 
-    private String getParameters(HttpServletRequest request) {
-        StringBuilder posted = new StringBuilder();
-        Enumeration<?> e = request.getParameterNames();
-        if (e != null) {
-            posted.append("?");
-        }
-        while (e.hasMoreElements()) {
-            if (posted.length() > 1) {
-                posted.append("&");
-            }
-            String curr = (String) e.nextElement();
-            posted.append(curr + "=");
-            if (curr.contains("password") || curr.contains("pass") || curr.contains("pwd")) {
-                posted.append("*****");
-            } else {
-                posted.append(request.getParameter(curr));
-            }
-        }
-        String ip = request.getHeader("X-FORWARDED-FOR");
-        String ipAddr = (ip == null) ? getRemoteAddr(request) : ip;
-        if (ipAddr != null && !ipAddr.equals("")) {
-            posted.append("&_psip=" + ipAddr);
-        }
-        return posted.toString();
-    }
-
-    private String getRemoteAddr(HttpServletRequest request) {
-        String ipFromHeader = request.getHeader("X-FORWARDED-FOR");
-        if (ipFromHeader != null && ipFromHeader.length() > 0) {
-            logger.debug("ip from proxy - X-FORWARDED-FOR : " + ipFromHeader);
-            return ipFromHeader;
-        }
-        return request.getRemoteAddr();
+    public static Optional<LogEventCollector> getLogEventCollector() {
+        return Optional.ofNullable(dataHolder.get());
     }
 
 }
