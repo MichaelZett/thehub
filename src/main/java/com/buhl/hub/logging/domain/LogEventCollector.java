@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class LogEventCollector {
+    public final static String NAME = "logCollector";
     private LogEvent logEvent;
     private Map<String, Object> errors = new HashMap<>();
     private Map<String, Object> warnings = new HashMap<>();

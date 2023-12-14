@@ -17,9 +17,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 public class LoggerInterceptor implements HandlerInterceptor {
-    public static final ThreadLocal<LogEventCollector> dataHolder = new ThreadLocal<>();
     private final LogEventRepository logEventRepository;
-
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -41,7 +39,7 @@ public class LoggerInterceptor implements HandlerInterceptor {
             LogEventCollector collector = new LogEventCollector();
             collector.startLog(className, methodName, null, "TEST",
                     caller, contactNo, ParamTypes.FORMPARAMS, request);
-            dataHolder.set(collector);
+            request.setAttribute(LogEventCollector.NAME, collector);
         }
         return true;
     }
@@ -52,15 +50,10 @@ public class LoggerInterceptor implements HandlerInterceptor {
         if (ex != null) {
             ex.printStackTrace();
         }
-        final LogEventCollector collector = dataHolder.get();
+        final LogEventCollector collector = (LogEventCollector) request.getAttribute(LogEventCollector.NAME);
         if (collector != null) {
             logEventRepository.save(collector.finalizeLogEvent());
-            dataHolder.remove();
         }
-    }
-
-    public static Optional<LogEventCollector> getLogEventCollector() {
-        return Optional.ofNullable(dataHolder.get());
     }
 
 }

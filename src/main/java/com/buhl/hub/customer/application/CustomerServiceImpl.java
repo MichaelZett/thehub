@@ -3,7 +3,7 @@ package com.buhl.hub.customer.application;
 import com.buhl.hub.customer.domain.Customer;
 import com.buhl.hub.customer.domain.CustomerRepository;
 import com.buhl.hub.customer.values.CustomerDTO;
-import com.buhl.hub.logging.adapter.LoggerInterceptor;
+import com.buhl.hub.logging.application.LogEventCollectorHelper;
 import com.buhl.hub.logging.domain.LogEventCollector;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Collection<CustomerDTO> getAll() {
-        Optional<LogEventCollector> collector = LoggerInterceptor.getLogEventCollector();
+        Optional<LogEventCollector> collector = LogEventCollectorHelper.getLogEventCollector();
         collector.ifPresent(logEventCollector -> logEventCollector.addWarning("customerService has a concern"));
 
         return StreamSupport.stream(customerRepository.findAll().spliterator(), false).map(Customer::toDto).toList();
